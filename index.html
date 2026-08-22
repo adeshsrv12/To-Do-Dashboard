@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExaGuru — Marketing &amp; Operations Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue-50:#eef4ff; --blue-100:#dbe7ff; --blue-500:#2f6fed; --blue-600:#2159d6; --blue-700:#1a46ab;
+  --amber-50:#fff7e6; --amber-500:#e8a317; --amber-700:#93650b;
+  --green-50:#eafaf1; --green-500:#1ea363; --green-700:#0f6e42;
+  --red-50:#fdeceb; --red-500:#e0483f; --red-700:#a72e27;
+  --grey-50:#f6f7f9; --grey-100:#eef0f3; --grey-200:#e3e6eb; --grey-300:#cdd2da;
+  --ink-900:#12151c; --ink-700:#3a3f4b; --ink-500:#6b7280; --ink-400:#9198a3;
+  --white:#ffffff;
+  --radius:14px; --radius-sm:9px;
+  --shadow-sm:0 1px 2px rgba(18,21,28,.04), 0 1px 1px rgba(18,21,28,.03);
+  --shadow-md:0 6px 20px rgba(18,21,28,.06), 0 2px 6px rgba(18,21,28,.04);
+  --font-display:'Manrope',sans-serif; --font-body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body); background:var(--white); color:var(--ink-900);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display); margin:0; letter-spacing:-.01em;}
+p{margin:0;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit; font-size:13.5px;}
+::-webkit-scrollbar{width:8px; height:8px;}
+::-webkit-scrollbar-thumb{background:var(--grey-300); border-radius:8px;}
+
+/* ---------- layout ---------- */
+#app{display:flex; min-height:100vh;}
+.sidebar{
+  width:230px; flex:none; background:var(--white); border-right:1px solid var(--grey-200);
+  display:flex; flex-direction:column; position:sticky; top:0; height:100vh;
+}
+.brand{display:flex; align-items:center; gap:10px; padding:20px 18px 16px;}
+.brand-mark{
+  width:34px; height:34px; border-radius:10px; background:linear-gradient(155deg,var(--blue-500),var(--blue-700));
+  display:flex; align-items:center; justify-content:center; flex:none;
+}
+.brand-mark svg{width:19px; height:19px;}
+.brand-name{font-family:var(--font-display); font-weight:800; font-size:16.5px; line-height:1.1;}
+.brand-sub{font-size:10px; color:var(--ink-400); font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin-top:2px;}
+.nav{flex:1; padding:6px 12px; overflow-y:auto;}
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:10px; color:var(--ink-700);
+  font-size:13.6px; font-weight:600; cursor:pointer; margin-bottom:2px; border:1px solid transparent;
+}
+.nav-item svg{width:17px; height:17px; flex:none; opacity:.75;}
+.nav-item:hover{background:var(--grey-50);}
+.nav-item.active{background:var(--blue-50); color:var(--blue-700); border-color:var(--blue-100);}
+.nav-item.active svg{opacity:1;}
+.sidebar-foot{padding:14px 18px; border-top:1px solid var(--grey-200); font-size:11px; color:var(--ink-400); font-weight:500;}
+
+.main{flex:1; min-width:0; background:var(--grey-50); min-height:100vh;}
+.topbar{
+  position:sticky; top:0; z-index:20; background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--grey-200); display:flex; align-items:center; gap:14px; padding:12px 26px;
+}
+.topbar-title{flex:none;}
+.topbar-title h1{font-size:19px; font-weight:800;}
+.topbar-title .date-line{font-size:12px; color:var(--ink-500); font-weight:600; margin-top:1px;}
+.search-wrap{flex:1; max-width:380px; margin-left:14px; position:relative;}
+.search-wrap input{
+  width:100%; padding:8px 12px 8px 32px; border-radius:10px; border:1px solid var(--grey-200); background:var(--grey-50);
+  font-size:13px; outline:none;
+}
+.search-wrap input:focus{border-color:var(--blue-500); background:var(--white);}
+.search-wrap svg{position:absolute; left:10px; top:50%; transform:translateY(-50%); width:15px; height:15px; color:var(--ink-400);}
+.topbar-actions{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  width:36px; height:36px; border-radius:10px; border:1px solid var(--grey-200); background:var(--white);
+  display:flex; align-items:center; justify-content:center; position:relative;
+}
+.icon-btn svg{width:17px; height:17px; color:var(--ink-700);}
+.icon-btn .dot{position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--red-500); border:1.5px solid var(--white);}
+.btn{
+  border-radius:10px; border:1px solid var(--grey-200); background:var(--white); padding:8px 14px;
+  font-size:13px; font-weight:700; color:var(--ink-700); display:inline-flex; align-items:center; gap:6px;
+}
+.btn:hover{background:var(--grey-50);}
+.btn-primary{background:var(--blue-500); border-color:var(--blue-500); color:#fff;}
+.btn-primary:hover{background:var(--blue-600);}
+.btn-danger{color:var(--red-700); border-color:var(--red-50); background:var(--red-50);}
+.btn-sm{padding:5px 10px; font-size:12px; border-radius:8px;}
+.btn svg{width:14px; height:14px;}
+
+.content{padding:22px 26px 90px;}
+.section-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+.section-head h2{font-size:17px; font-weight:800;}
+.section-head .sub{font-size:12.5px; color:var(--ink-500); margin-top:2px; font-weight:500;}
+
+/* ---------- cards / grid ---------- */
+.grid{display:grid; gap:14px;}
+.grid-5{grid-template-columns:repeat(5,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:1200px){.grid-5{grid-template-columns:repeat(3,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:760px){.grid-5,.grid-3,.grid-2{grid-template-columns:1fr;}}
+
+.card{
+  background:var(--white); border:1px solid var(--grey-200); border-radius:var(--radius); box-shadow:var(--shadow-sm);
+  padding:16px;
+}
+.stat-card{position:relative; overflow:hidden;}
+.stat-card .stat-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+.stat-card .stat-label{font-size:11.5px; font-weight:700; color:var(--ink-500); text-transform:uppercase; letter-spacing:.03em;}
+.stat-card .stat-icon{width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center;}
+.stat-card .stat-icon svg{width:15px; height:15px;}
+.stat-card .stat-value{font-family:var(--font-display); font-size:26px; font-weight:800;}
+.stat-card .stat-foot{font-size:11.5px; color:var(--ink-400); margin-top:4px; font-weight:600;}
+
+/* signature: ring progress */
+.ring-wrap{position:relative; width:54px; height:54px; flex:none;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.ring-bg{fill:none; stroke:var(--grey-200); stroke-width:5;}
+.ring-fg{fill:none; stroke:var(--blue-500); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset .4s;}
+.ring-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; font-family:var(--font-display);}
+
+/* badges */
+.badge{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:100px; font-size:11px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; border:1px solid transparent; white-space:nowrap;}
+.badge .bdot{width:6px; height:6px; border-radius:50%;}
+.badge-amber{background:var(--amber-50); color:var(--amber-700);}
+.badge-amber .bdot{background:var(--amber-500);}
+.badge-blue{background:var(--blue-50); color:var(--blue-700);}
+.badge-blue .bdot{background:var(--blue-500);}
+.badge-green{background:var(--green-50); color:var(--green-700);}
+.badge-green .bdot{background:var(--green-500);}
+.badge-red{background:var(--red-50); color:var(--red-700);}
+.badge-red .bdot{background:var(--red-500);}
+.badge-grey{background:var(--grey-100); color:var(--ink-500);}
+.badge-grey .bdot{background:var(--ink-400);}
+
+.pill{padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:700; border:1px solid var(--grey-200); background:var(--white); color:var(--ink-500); cursor:pointer;}
+.pill.active{background:var(--ink-900); color:#fff; border-color:var(--ink-900);}
+.pill-row{display:flex; gap:6px; flex-wrap:wrap;}
+
+/* alerts */
+.alert{display:flex; gap:10px; align-items:flex-start; padding:11px 13px; border-radius:11px; border:1px solid; margin-bottom:8px; font-size:12.8px;}
+.alert svg{width:16px; height:16px; flex:none; margin-top:1px;}
+.alert-red{background:var(--red-50); border-color:#f5c9c5; color:var(--red-700);}
+.alert-amber{background:var(--amber-50); border-color:#f3dca4; color:var(--amber-700);}
+.alert-blue{background:var(--blue-50); border-color:var(--blue-100); color:var(--blue-700);}
+.alert b{font-weight:800;}
+.alert .a-sub{color:inherit; opacity:.8; font-weight:500;}
+
+/* task rows */
+.list{background:var(--white); border:1px solid var(--grey-200); border-radius:var(--radius); overflow:hidden;}
+.task-row{display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--grey-100);}
+.task-row:last-child{border-bottom:none;}
+.task-row:hover{background:var(--grey-50);}
+.chk{width:19px; height:19px; border-radius:6px; border:1.6px solid var(--grey-300); flex:none; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#fff;}
+.chk.checked{background:var(--green-500); border-color:var(--green-500);}
+.chk svg{width:12px; height:12px; color:#fff; display:none;}
+.chk.checked svg{display:block;}
+.task-main{flex:1; min-width:0;}
+.task-name{font-size:13.6px; font-weight:700; color:var(--ink-900);}
+.task-name.done{text-decoration:line-through; color:var(--ink-400); font-weight:600;}
+.task-meta{font-size:11.5px; color:var(--ink-500); margin-top:3px; display:flex; gap:8px; flex-wrap:wrap; font-weight:500;}
+.task-meta span{display:inline-flex; align-items:center; gap:3px;}
+.task-badges{display:flex; gap:6px; align-items:center; flex:none;}
+.row-actions{display:flex; gap:4px; flex:none;}
+.icon-btn-sm{width:28px; height:28px; border-radius:8px; border:1px solid var(--grey-200); background:#fff; display:flex; align-items:center; justify-content:center;}
+.icon-btn-sm svg{width:13px; height:13px; color:var(--ink-500);}
+.icon-btn-sm:hover{background:var(--grey-50);}
+
+.empty{padding:40px 20px; text-align:center; color:var(--ink-400);}
+.empty svg{width:34px; height:34px; margin-bottom:8px; opacity:.5;}
+.empty .e-title{font-weight:700; color:var(--ink-700); font-size:13.5px;}
+.empty .e-sub{font-size:12px; margin-top:3px;}
+
+/* modal */
+.modal-backdrop{position:fixed; inset:0; background:rgba(18,21,28,.45); z-index:100; display:flex; align-items:flex-start; justify-content:center; padding:5vh 16px; overflow-y:auto;}
+.modal{background:#fff; border-radius:16px; width:560px; max-width:100%; box-shadow:0 20px 60px rgba(0,0,0,.25); overflow:hidden;}
+.modal-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--grey-200);}
+.modal-head h3{font-size:15.5px; font-weight:800;}
+.modal-body{padding:18px 20px; max-height:70vh; overflow-y:auto;}
+.modal-foot{padding:14px 20px; border-top:1px solid var(--grey-200); display:flex; justify-content:flex-end; gap:8px;}
+.field{margin-bottom:13px;}
+.field label{display:block; font-size:11.5px; font-weight:700; color:var(--ink-500); margin-bottom:5px; text-transform:uppercase; letter-spacing:.02em;}
+.field input, .field select, .field textarea{
+  width:100%; padding:9px 11px; border-radius:9px; border:1px solid var(--grey-200); outline:none; background:var(--grey-50);
+}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--blue-500); background:#fff;}
+.field textarea{resize:vertical; min-height:60px;}
+.field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.close-x{width:28px; height:28px; border-radius:8px; border:none; background:var(--grey-100); display:flex; align-items:center; justify-content:center;}
+.close-x svg{width:14px; height:14px;}
+
+/* tabs */
+.tab-bar{display:flex; gap:4px; background:var(--grey-100); padding:4px; border-radius:11px; width:fit-content; margin-bottom:16px;}
+.tab-btn{padding:7px 14px; border-radius:8px; font-size:12.8px; font-weight:700; color:var(--ink-500); border:none; background:transparent;}
+.tab-btn.active{background:#fff; color:var(--ink-900); box-shadow:var(--shadow-sm);}
+
+/* course */
+.course-card{cursor:pointer; transition:box-shadow .15s;}
+.course-card:hover{box-shadow:var(--shadow-md);}
+.progress-bar{height:7px; background:var(--grey-100); border-radius:100px; overflow:hidden; margin-top:6px;}
+.progress-bar > div{height:100%; background:var(--blue-500); border-radius:100px;}
+.progress-bar.green > div{background:var(--green-500);}
+.checklist-item{display:flex; align-items:center; gap:9px; padding:6px 0; font-size:13px;}
+.checklist-item .txt{flex:1;}
+.checklist-item.done .txt{text-decoration:line-through; color:var(--ink-400);}
+.mini-add{display:flex; gap:6px; margin-top:8px;}
+.mini-add input{flex:1; padding:7px 10px; border-radius:8px; border:1px solid var(--grey-200); font-size:12.5px; background:var(--grey-50);}
+
+.timeline{position:relative; padding-left:22px; margin-top:10px;}
+.timeline:before{content:''; position:absolute; left:6px; top:4px; bottom:4px; width:2px; background:var(--grey-200);}
+.tl-item{position:relative; padding-bottom:18px; cursor:pointer;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{position:absolute; left:-22px; top:1px; width:13px; height:13px; border-radius:50%; background:var(--grey-300); border:2px solid #fff; box-shadow:0 0 0 2px var(--grey-300);}
+.tl-item.done .tl-dot{background:var(--green-500); box-shadow:0 0 0 2px var(--green-500);}
+.tl-item.overdue .tl-dot{background:var(--red-500); box-shadow:0 0 0 2px var(--red-500);}
+.tl-item.next .tl-dot{background:var(--blue-500); box-shadow:0 0 0 2px var(--blue-500);}
+.tl-title{font-size:13px; font-weight:700;}
+.tl-sub{font-size:11.5px; color:var(--ink-500); margin-top:2px; font-weight:500;}
+
+/* kanban */
+.kanban{display:flex; gap:12px; overflow-x:auto; padding-bottom:10px;}
+.kcol{background:var(--grey-100); border-radius:14px; padding:10px; width:230px; flex:none; min-height:200px;}
+.kcol-head{display:flex; align-items:center; justify-content:space-between; padding:2px 4px 10px;}
+.kcol-head h4{font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-500);}
+.kcol-count{background:var(--white); border-radius:100px; font-size:11px; font-weight:700; padding:1px 7px; color:var(--ink-500);}
+.kcard{background:#fff; border-radius:11px; padding:10px 11px; margin-bottom:8px; border:1px solid var(--grey-200); box-shadow:var(--shadow-sm); cursor:grab;}
+.kcard:active{cursor:grabbing;}
+.kcard .kc-title{font-size:12.6px; font-weight:700; margin-bottom:5px;}
+.kcard .kc-meta{font-size:10.8px; color:var(--ink-500); display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-weight:600;}
+.kcol.dragover{background:var(--blue-50);}
+
+/* calendar */
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+.cal-dow{font-size:10.5px; font-weight:800; color:var(--ink-400); text-align:center; text-transform:uppercase; padding-bottom:4px;}
+.cal-cell{min-height:82px; border:1px solid var(--grey-200); border-radius:10px; padding:6px; background:#fff; cursor:pointer;}
+.cal-cell:hover{border-color:var(--blue-500);}
+.cal-cell.other{opacity:.35;}
+.cal-cell.today{border-color:var(--blue-500); background:var(--blue-50);}
+.cal-daynum{font-size:11.5px; font-weight:700; color:var(--ink-700);}
+.cal-chip{background:var(--blue-500); color:#fff; font-size:9.5px; font-weight:700; padding:2px 5px; border-radius:5px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.cal-chip.completed{background:var(--green-500);}
+.cal-chip.cancelled{background:var(--red-500); text-decoration:line-through;}
+
+.webinar-card{border:1px solid var(--grey-200); border-radius:14px; padding:15px; background:#fff; margin-bottom:12px;}
+.webinar-card .wc-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+.wc-title{font-size:14.5px; font-weight:800;}
+.wc-meta{font-size:12px; color:var(--ink-500); margin-top:5px; font-weight:600; display:flex; gap:12px; flex-wrap:wrap;}
+.wc-meta span{display:inline-flex; align-items:center; gap:4px;}
+.wc-actions{display:flex; gap:7px; margin-top:12px; flex-wrap:wrap;}
+
+/* table */
+table.data-table{width:100%; border-collapse:collapse; font-size:12.8px;}
+table.data-table th{text-align:left; font-size:10.8px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-400); font-weight:800; padding:8px 10px; border-bottom:2px solid var(--grey-200);}
+table.data-table td{padding:11px 10px; border-bottom:1px solid var(--grey-100); vertical-align:top;}
+table.data-table tr:last-child td{border-bottom:none;}
+
+.metric-input-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:10px;}
+.bar-chart{display:flex; align-items:flex-end; gap:10px; height:120px; padding-top:10px;}
+.bar-chart .bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;}
+.bar-chart .bar{width:60%; background:var(--blue-500); border-radius:6px 6px 0 0; min-height:2px;}
+.bar-chart .bar-lbl{font-size:10.5px; font-weight:700; color:var(--ink-500); margin-top:6px;}
+
+/* fab */
+.fab-wrap{position:fixed; right:28px; bottom:28px; z-index:50;}
+.fab{
+  width:54px; height:54px; border-radius:16px; background:var(--blue-500); color:#fff; border:none;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 10px 24px rgba(47,111,237,.4);
+}
+.fab svg{width:24px; height:24px; transition:transform .2s;}
+.fab.open svg{transform:rotate(45deg);}
+.fab-menu{position:absolute; bottom:64px; right:0; background:#fff; border:1px solid var(--grey-200); border-radius:14px; box-shadow:var(--shadow-md); padding:6px; width:190px; display:none;}
+.fab-menu.open{display:block;}
+.fab-menu-item{display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:9px; font-size:12.8px; font-weight:700; color:var(--ink-700);}
+.fab-menu-item:hover{background:var(--grey-50);}
+.fab-menu-item svg{width:15px; height:15px; color:var(--blue-500);}
+
+/* notif dropdown */
+.dropdown{position:absolute; top:44px; right:0; width:330px; background:#fff; border:1px solid var(--grey-200); border-radius:14px; box-shadow:var(--shadow-md); z-index:60; display:none; max-height:420px; overflow-y:auto; padding:8px;}
+.dropdown.open{display:block;}
+.dd-head{font-size:11.5px; font-weight:800; color:var(--ink-500); text-transform:uppercase; padding:8px 8px 6px;}
+
+.toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink-900); color:#fff; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:600; z-index:200; box-shadow:var(--shadow-md); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+.demo-tag{background:var(--ink-900); color:#fff; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:5px; letter-spacing:.04em;}
+
+.how-box{background:var(--blue-50); border:1px solid var(--blue-100); border-radius:14px; padding:18px 20px; margin-bottom:16px;}
+.how-box h4{font-size:14px; margin-bottom:8px;}
+.how-box ol{margin:0; padding-left:18px; font-size:13px; line-height:1.9; color:var(--ink-700);}
+
+@media(max-width:900px){
+  .sidebar{position:fixed; left:-240px; z-index:90; transition:left .2s; box-shadow:var(--shadow-md);}
+  .sidebar.open{left:0;}
+  .search-wrap{display:none;}
+  .content{padding:16px;}
+  .field-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 17V7l8-4 8 4v10l-8 4-8-4Z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">ExaGuru</div>
+        <div class="brand-sub">Elevate Your IT Career</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot">exaguru.official · v1.0</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="icon-btn" style="display:none" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div class="topbar-title">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="date-line" id="dateLine"></div>
+      </div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="globalSearch" placeholder="Search tasks, content…" oninput="onGlobalSearch(this.value)">
+      </div>
+      <div class="topbar-actions">
+        <div style="position:relative">
+          <button class="icon-btn" onclick="toggleNotif(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span class="dot" id="notifDot" style="display:none"></span>
+          </button>
+          <div class="dropdown" id="notifDropdown"></div>
+        </div>
+        <button class="btn btn-primary" onclick="openQuickAdd('task')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>
+          Quick Add
+        </button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<div class="fab-wrap">
+  <div class="fab-menu" id="fabMenu"></div>
+  <button class="fab" id="fabBtn" onclick="toggleFab()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================= ICONS ============================= */
+const ICONS = {
+  dashboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  tasks:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  courses:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>',
+  webinars:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  content:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="12" rx="1.5"/><rect x="3" y="13" width="7" height="8" rx="1.5"/><rect x="14" y="18" width="7" height="3" rx="1"/></svg>',
+  timing:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+  analytics:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V9M9 21V3M15 21v-7M21 21V5"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7L13 18"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg>',
+  download:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>',
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>',
+  reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>'
+};
+
+/* ============================= CONSTANTS ============================= */
+const NAV_ITEMS = [
+  {id:'dashboard', label:'Dashboard', icon:'dashboard'},
+  {id:'tasks', label:'Daily Tasks', icon:'tasks'},
+  {id:'courses', label:'Courses', icon:'courses'},
+  {id:'webinars', label:'Webinars', icon:'webinars'},
+  {id:'content', label:'Content Calendar', icon:'content'},
+  {id:'timing', label:'Social Timing', icon:'timing'},
+  {id:'analytics', label:'Analytics', icon:'analytics'},
+  {id:'settings', label:'Settings', icon:'settings'},
+];
+const PLATFORMS = ['LinkedIn','Instagram','YouTube','WhatsApp','Email','Website','Zoom','Other'];
+const CATEGORIES = ['Content','Marketing','Course','Webinar','Design','Video','Outreach','Research','Admin'];
+const TASK_STATUSES = ['HOLD','IN PROGRESS','COMPLETED'];
+const PRIORITIES = ['LOW','MEDIUM','HIGH','URGENT'];
+const COURSE_STATUSES = ['PLANNING','CONTENT IN PROGRESS','LAB IN PROGRESS','READY','LIVE','COMPLETED'];
+const WEBINAR_STATUSES = ['PLANNED','PROMOTION','REGISTRATION OPEN','LIVE','COMPLETED','CANCELLED'];
+const CONTENT_TYPES = ['Reel','Carousel','Single Image','Poll','Text Post','Short','Long Video','Story','Community Post'];
+const CREATIVE_STATUSES = ['IDEA','SCRIPT','DESIGN','READY'];
+const PUBLISH_STATUSES = ['SCHEDULED','PUBLISHED'];
+const KANBAN_COLS = ['IDEAS','SCRIPT','DESIGN','EDITING','READY','SCHEDULED','PUBLISHED'];
+const MILESTONE_STAGES = [
+  {key:'created', label:'Course Created'},
+  {key:'contentStart', label:'Content Start'},
+  {key:'labStart', label:'Lab Start'},
+  {key:'contentComplete', label:'Content Complete'},
+  {key:'labComplete', label:'Lab Complete'},
+  {key:'recordingComplete', label:'Recording Complete'},
+  {key:'ready', label:'Course Ready'},
+  {key:'live', label:'Course Live'},
+];
+const CHECKLIST_TEMPLATE = [
+  {group:'7 DAYS BEFORE', items:['LinkedIn announcement','Instagram post','YouTube Short','WhatsApp announcement']},
+  {group:'5 DAYS BEFORE', items:['LinkedIn educational post','Instagram Reel','Email']},
+  {group:'3 DAYS BEFORE', items:['Reminder post','WhatsApp reminder']},
+  {group:'1 DAY BEFORE', items:['Final reminder','Stories','Email reminder']},
+  {group:'2 HOURS BEFORE', items:['WhatsApp reminder','LinkedIn reminder']},
+  {group:'30 MIN BEFORE', items:['Final registration reminder']},
+  {group:'AFTER WEBINAR', items:['Recording','Highlights Reel','Follow-up email','Leads follow-up']},
+];
+const STATUS_COLOR = {
+  'HOLD':'amber','IN PROGRESS':'blue','COMPLETED':'green','BLOCKED':'red',
+  'PLANNING':'grey','CONTENT IN PROGRESS':'blue','LAB IN PROGRESS':'blue','READY':'amber','LIVE':'blue',
+  'PLANNED':'grey','PROMOTION':'amber','REGISTRATION OPEN':'amber','CANCELLED':'red',
+  'NOT STARTED':'grey','IDEA':'grey','SCRIPT':'amber','DESIGN':'amber','SCHEDULED':'blue','PUBLISHED':'green',
+  'LOW':'grey','MEDIUM':'blue','HIGH':'amber','URGENT':'red'
+};
+
+/* ============================= STATE ============================= */
+let state = null;
+let saveTimer = null;
+const STORAGE_KEY = 'exaguru-dashboard-state-v1';
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function pad(n){ return n<10?'0'+n:''+n; }
+
+function demoState(){
+  const today = new Date();
+  const iso = (offsetDays)=>{ const d=new Date(); d.setDate(d.getDate()+offsetDays); return d.toISOString().slice(0,10); };
+  return {
+    tasks: [],
+    courses: [{
+      id:'demo-course-oci', demo:true, name:'OCI', category:'Oracle Cloud', startDate: iso(-40), launchDate: iso(-10),
+      trainer:'Sanchit', totalSessions:12, status:'LIVE',
+      modules:[
+        {id:uid(), name:'VCN', status:'COMPLETED'},
+        {id:uid(), name:'Subnets', status:'COMPLETED'},
+        {id:uid(), name:'Route Tables', status:'COMPLETED'},
+        {id:uid(), name:'Internet Gateway', status:'COMPLETED'},
+        {id:uid(), name:'NAT Gateway', status:'IN PROGRESS'},
+        {id:uid(), name:'Security Lists', status:'NOT STARTED'},
+        {id:uid(), name:'DRG', status:'NOT STARTED'},
+        {id:uid(), name:'OCI Architecture', status:'NOT STARTED'},
+      ],
+      labs:[
+        {id:uid(), name:'VCN Setup', status:'COMPLETED'},
+        {id:uid(), name:'Subnet Configuration', status:'COMPLETED'},
+        {id:uid(), name:'Routing', status:'IN PROGRESS'},
+        {id:uid(), name:'NAT Gateway', status:'NOT STARTED'},
+        {id:uid(), name:'Security Configuration', status:'NOT STARTED'},
+        {id:uid(), name:'DRG Connectivity', status:'NOT STARTED'},
+      ],
+      milestones:{
+        created:{planned:iso(-40), done:iso(-40)},
+        contentStart:{planned:iso(-35), done:iso(-35)},
+        labStart:{planned:iso(-28), done:iso(-28)},
+        contentComplete:{planned:iso(-18), done:iso(-18)},
+        labComplete:{planned:iso(-4), done:''},
+        recordingComplete:{planned:iso(2), done:''},
+        ready:{planned:iso(6), done:''},
+        live:{planned:iso(-10), done:iso(-10)},
+      }
+    }],
+    webinars:[{
+      id:'demo-webinar-oci', demo:true, title:'Free Live OCI Technical Session', date:'2026-08-21', startTime:'22:00', endTime:'23:00',
+      platform:'Zoom', topic:'OCI Networking Fundamentals', trainer:'Sanchit', regLink:'https://www.exaguru.com/register',
+      meetingLink:'https://zoom.us/j/demo', expectedAttendees:150, status:'COMPLETED', notes:'Demo webinar — edit or delete freely.',
+      checklist: buildChecklist(true)
+    }],
+    content: [],
+    socialOverrides: {linkedin:'', instagram:'', youtubeShorts:'', youtubeLong:''},
+    analyticsLog: {linkedin:[], instagram:[], youtube:[], webinar:[]},
+    ui: {activeTab:'dashboard', taskFilter:'ALL', taskSearch:'', webinarView:'agenda', calMonth:today.getMonth(), calYear:today.getFullYear(), openCourseId:null}
+  };
+}
+function buildChecklist(allDone){
+  const out=[];
+  CHECKLIST_TEMPLATE.forEach(g=>{
+    g.items.forEach(label=>{ out.push({id:uid(), group:g.group, label, done: !!allDone}); });
+  });
+  return out;
+}
+
+/* Storage layer: uses the Claude.ai artifact "window.storage" API when this file is
+   viewed inside a Claude.ai artifact (so it persists to your account), and automatically
+   falls back to the browser's own localStorage when the file is opened directly
+   (double-clicked, or opened via file:// / a local server) — which is the normal case
+   once you've downloaded this dashboard. Either way, a refresh never loses your data. */
+const hasCloudStorage = (typeof window !== 'undefined') && !!window.storage && typeof window.storage.get === 'function';
+
+async function storageGet(key){
+  if(hasCloudStorage){
+    try{ const r = await window.storage.get(key); if(r) return r; }catch(e){ /* fall through to localStorage */ }
+  }
+  try{
+    const v = localStorage.getItem(key);
+    return v!==null ? {key, value:v} : null;
+  }catch(e){ return null; }
+}
+async function storageSet(key, value){
+  if(hasCloudStorage){
+    try{ const r = await window.storage.set(key, value); if(r) return r; }catch(e){ /* fall through to localStorage */ }
+  }
+  try{ localStorage.setItem(key, value); return {key, value}; }
+  catch(e){ console.error('localStorage save failed', e); toast('Could not save — your browser may be blocking local storage'); return null; }
+}
+
+async function loadState(){
+  try{
+    const res = await storageGet(STORAGE_KEY);
+    if(res && res.value){ state = JSON.parse(res.value); }
+    else { state = demoState(); }
+  }catch(e){ state = demoState(); }
+  if(!state.ui) state.ui = {activeTab:'dashboard', taskFilter:'ALL', taskSearch:'', webinarView:'agenda', calMonth:new Date().getMonth(), calYear:new Date().getFullYear(), openCourseId:null};
+  if(!state.analyticsLog) state.analyticsLog = {linkedin:[], instagram:[], youtube:[], webinar:[]};
+  if(!state.socialOverrides) state.socialOverrides = {linkedin:'', instagram:'', youtubeShorts:'', youtubeLong:''};
+}
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    await storageSet(STORAGE_KEY, JSON.stringify(state));
+  }, 250);
+}
+
+/* ============================= HELPERS ============================= */
+function badge(text, colorClass){
+  colorClass = colorClass || STATUS_COLOR[text] || 'grey';
+  return `<span class="badge badge-${colorClass}"><span class="bdot"></span>${text}</span>`;
+}
+function fmtDateNice(iso){
+  if(!iso) return '—';
+  const d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtTime(t){
+  if(!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  const ap = h>=12?'PM':'AM'; let hh = h%12; if(hh===0) hh=12;
+  return `${hh}:${pad(m)} ${ap}`;
+}
+function daysBetween(iso){
+  if(!iso) return null;
+  const a = new Date(todayISO()+'T00:00:00'); const b = new Date(iso+'T00:00:00');
+  return Math.round((b-a)/86400000);
+}
+function isOverdue(iso, done){ if(!iso||done) return false; return daysBetween(iso)<0; }
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg){
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function ring(pct, size=54, stroke=5){
+  pct = Math.max(0, Math.min(100, Math.round(pct||0)));
+  const r = (size-stroke)/2, c = 2*Math.PI*r, off = c - (pct/100)*c;
+  return `<div class="ring-wrap" style="width:${size}px;height:${size}px"><svg width="${size}" height="${size}"><circle class="ring-bg" cx="${size/2}" cy="${size/2}" r="${r}"/><circle class="ring-fg" cx="${size/2}" cy="${size/2}" r="${r}" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg><div class="ring-label">${pct}%</div></div>`;
+}
+
+/* ============================= ALERTS ============================= */
+function computeAlerts(){
+  const alerts = [];
+  state.tasks.forEach(t=>{
+    if(t.status!=='COMPLETED' && t.date && isOverdue(t.date,false)){
+      alerts.push({level:'red', title:'Task overdue', sub:`${t.name} · was due ${fmtDateNice(t.date)}`});
+    }
+  });
+  state.webinars.forEach(w=>{
+    if(w.status==='CANCELLED'||w.status==='COMPLETED') return;
+    const d = daysBetween(w.date);
+    if(d===0) alerts.push({level:'red', title:'Webinar today', sub:`${w.title} · ${fmtTime(w.startTime)} IST`});
+    else if(d===1) alerts.push({level:'amber', title:'Webinar tomorrow', sub:`${w.title} · ${fmtTime(w.startTime)} IST`});
+  });
+  state.courses.forEach(c=>{
+    MILESTONE_STAGES.forEach(s=>{
+      const m = c.milestones[s.key];
+      if(!m) return;
+      if(m.planned && !m.done){
+        const d = daysBetween(m.planned);
+        if(d<0) alerts.push({level:'red', title:`Milestone overdue — ${c.name}`, sub:`${s.label} was due ${fmtDateNice(m.planned)}`});
+        else if(d<=2) alerts.push({level:'amber', title:`Milestone due soon — ${c.name}`, sub:`${s.label} in ${d} day${d===1?'':'s'}`});
+      }
+    });
+    (c.labs||[]).forEach(l=>{ if(l.status==='NOT STARTED' && c.milestones.labComplete && c.milestones.labComplete.planned){
+      const d = daysBetween(c.milestones.labComplete.planned);
+      if(d!==null && d<0) alerts.push({level:'amber', title:`Lab overdue — ${c.name}`, sub:`${l.name} not yet started`});
+    }});
+    if(c.launchDate){
+      const d = daysBetween(c.launchDate);
+      if(d!==null && d>=0 && d<=7 && c.status!=='LIVE' && c.status!=='COMPLETED') alerts.push({level:'blue', title:'Course launch approaching', sub:`${c.name} launches in ${d} day${d===1?'':'s'}`});
+    }
+  });
+  state.content.forEach(k=>{
+    if(k.date===todayISO() && k.publishingStatus!=='PUBLISHED') alerts.push({level:'blue', title:'Content scheduled today', sub:`${k.title} · ${k.platform}`});
+    if(k.date && daysBetween(k.date)<=1 && daysBetween(k.date)>=0 && k.creativeStatus!=='READY'){
+      alerts.push({level:'amber', title:'Content not ready', sub:`${k.title} is still "${k.creativeStatus}"`});
+    }
+  });
+  return alerts;
+}
+
+/* ============================= RENDER SHELL ============================= */
+function renderNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = NAV_ITEMS.map(i=>`
+    <div class="nav-item ${state.ui.activeTab===i.id?'active':''}" onclick="setTab('${i.id}')">
+      ${ICONS[i.icon]}<span>${i.label}</span>
+    </div>`).join('');
+}
+function setTab(id){
+  state.ui.activeTab = id; state.ui.openCourseId = null;
+  document.getElementById('sidebar').classList.remove('open');
+  render();
+}
+function render(){
+  renderNav();
+  const titles = {dashboard:'Dashboard', tasks:'Daily Tasks', courses:'Courses', webinars:'Webinars', content:'Content Calendar', timing:'Social Timing', analytics:'Analytics', settings:'Settings'};
+  document.getElementById('pageTitle').textContent = titles[state.ui.activeTab];
+  const now = new Date();
+  document.getElementById('dateLine').textContent = now.toLocaleDateString('en-US',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const map = {dashboard:renderDashboard, tasks:renderTasks, courses:renderCourses, webinars:renderWebinars, content:renderContent, timing:renderTiming, analytics:renderAnalytics, settings:renderSettings};
+  document.getElementById('content').innerHTML = map[state.ui.activeTab]();
+  renderNotifBadge();
+  renderFabMenu();
+}
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(){
+  const todayTasks = state.tasks.filter(t=>t.date===todayISO());
+  const inProgress = state.tasks.filter(t=>t.status==='IN PROGRESS').length;
+  const completed = state.tasks.filter(t=>t.status==='COMPLETED').length;
+  const upcomingWebinars = state.webinars.filter(w=>daysBetween(w.date)!==null && daysBetween(w.date)>=0 && w.status!=='CANCELLED' && w.status!=='COMPLETED').length;
+  const activeCourses = state.courses.filter(c=>c.status!=='COMPLETED').length;
+  const todayDone = todayTasks.length? Math.round(100*todayTasks.filter(t=>t.status==='COMPLETED').length/todayTasks.length) : 0;
+
+  const weekStart = new Date(); weekStart.setDate(weekStart.getDate()-weekStart.getDay());
+  const weekTasks = state.tasks.filter(t=>{ if(!t.date) return false; const d=new Date(t.date+'T00:00:00'); return d>=weekStart; });
+  const weekDone = weekTasks.length? Math.round(100*weekTasks.filter(t=>t.status==='COMPLETED').length/weekTasks.length) : 0;
+
+  let nextLaunch = null;
+  state.courses.forEach(c=>{ if(c.launchDate && daysBetween(c.launchDate)>=0 && (!nextLaunch || c.launchDate<nextLaunch.launchDate)) nextLaunch=c; });
+
+  const alerts = computeAlerts();
+
+  const stats = [
+    {label:"Today's Tasks", value: todayTasks.length, icon:'tasks', color:'blue', foot:`${todayTasks.filter(t=>t.status==='COMPLETED').length} completed today`},
+    {label:'In Progress', value: inProgress, icon:'clock', color:'amber', foot:'across all tasks'},
+    {label:'Completed', value: completed, icon:'check', color:'green', foot:'all-time tasks'},
+    {label:'Upcoming Webinars', value: upcomingWebinars, icon:'webinars', color:'blue', foot:'scheduled ahead'},
+    {label:'Active Courses', value: activeCourses, icon:'courses', color:'amber', foot:`${state.courses.length} total`},
+  ];
+
+  return `
+  <div class="grid grid-5" style="margin-bottom:16px">
+    ${stats.map(s=>`
+      <div class="card stat-card">
+        <div class="stat-top">
+          <span class="stat-label">${s.label}</span>
+          <div class="stat-icon" style="background:var(--${s.color}-50); color:var(--${s.color}-500)">${ICONS[s.icon]}</div>
+        </div>
+        <div class="stat-value">${s.value}</div>
+        <div class="stat-foot">${s.foot}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:16px">
+    <div class="card" style="display:flex; align-items:center; gap:14px;">
+      ${ring(todayDone,58)}
+      <div><div class="stat-label">Today's Progress</div><div style="font-size:13px;color:var(--ink-500);margin-top:3px;font-weight:600">${todayTasks.filter(t=>t.status==='COMPLETED').length} of ${todayTasks.length} tasks done</div></div>
+    </div>
+    <div class="card" style="display:flex; align-items:center; gap:14px;">
+      ${ring(weekDone,58)}
+      <div><div class="stat-label">Weekly Completion</div><div style="font-size:13px;color:var(--ink-500);margin-top:3px;font-weight:600">${weekTasks.filter(t=>t.status==='COMPLETED').length} of ${weekTasks.length} this week</div></div>
+    </div>
+    <div class="card">
+      <div class="stat-label">Upcoming Launch</div>
+      ${nextLaunch ? `<div style="font-size:16px;font-weight:800;margin-top:6px">${esc(nextLaunch.name)}</div><div style="font-size:12.5px;color:var(--ink-500);margin-top:2px;font-weight:600">${fmtDateNice(nextLaunch.launchDate)} · ${daysBetween(nextLaunch.launchDate)} days away</div>` : `<div style="font-size:13px;color:var(--ink-400);margin-top:10px">No upcoming launch scheduled.</div>`}
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div>
+      <div class="section-head"><h2>Alerts</h2><span class="sub">${alerts.length} active</span></div>
+      ${alerts.length ? alerts.slice(0,8).map(a=>`
+        <div class="alert alert-${a.level}">${ICONS.warn}<div><b>${esc(a.title)}</b><div class="a-sub">${esc(a.sub)}</div></div></div>
+      `).join('') : `<div class="empty">${ICONS.check}<div class="e-title">All clear</div><div class="e-sub">No overdue items or urgent alerts right now.</div></div>`}
+    </div>
+    <div>
+      <div class="section-head"><h2>Today</h2><span class="sub">${fmtDateNice(todayISO())}</span></div>
+      <div class="list">
+        ${todayTasks.length ? todayTasks.map(t=>taskRow(t)).join('') : `<div class="empty">${ICONS.tasks}<div class="e-title">Nothing on today's list</div><div class="e-sub">Use Quick Add to plan your day.</div></div>`}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+/* ============================= TASKS ============================= */
+function taskRow(t){
+  const done = t.status==='COMPLETED';
+  const overdue = isOverdue(t.date, done);
+  return `
+  <div class="task-row">
+    <div class="chk ${done?'checked':''}" onclick="toggleTaskDone('${t.id}')">${ICONS.check}</div>
+    <div class="task-main">
+      <div class="task-name ${done?'done':''}">${esc(t.name)}</div>
+      <div class="task-meta">
+        ${t.date?`<span>${ICONS.cal}${fmtDateNice(t.date)}${overdue?' · <b style="color:var(--red-500)">overdue</b>':''}</span>`:''}
+        ${t.time?`<span>${ICONS.clock}${fmtTime(t.time)}</span>`:''}
+        <span>${esc(t.platform||'—')}</span>
+        <span>${esc(t.category||'—')}</span>
+      </div>
+    </div>
+    <div class="task-badges">${badge(t.priority,STATUS_COLOR[t.priority])}${badge(t.status)}</div>
+    <div class="row-actions">
+      <div class="icon-btn-sm" onclick="openTaskModal('${t.id}')">${ICONS.edit}</div>
+      <div class="icon-btn-sm" onclick="deleteItem('tasks','${t.id}')">${ICONS.trash}</div>
+    </div>
+  </div>`;
+}
+function renderTasks(){
+  const f = state.ui.taskFilter, q = (state.ui.taskSearch||'').toLowerCase();
+  let list = state.tasks.slice().sort((a,b)=> (a.date||'9999').localeCompare(b.date||'9999'));
+  if(f==='TODAY') list = list.filter(t=>t.date===todayISO());
+  else if(f==='OVERDUE') list = list.filter(t=>isOverdue(t.date, t.status==='COMPLETED'));
+  else if(['HOLD','IN PROGRESS','COMPLETED'].includes(f)) list = list.filter(t=>t.status===f);
+  if(q) list = list.filter(t=> (t.name||'').toLowerCase().includes(q) || (t.notes||'').toLowerCase().includes(q) || (t.platform||'').toLowerCase().includes(q) || (t.category||'').toLowerCase().includes(q));
+
+  const filters = ['ALL','TODAY','OVERDUE','HOLD','IN PROGRESS','COMPLETED'];
+  return `
+  <div class="section-head">
+    <div><h2>Daily To-Do</h2><div class="sub">${state.tasks.length} total tasks</div></div>
+    <button class="btn btn-primary" onclick="openTaskModal()">${ICONS.plus} Add Task</button>
+  </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px;">
+    <div class="pill-row">${filters.map(fl=>`<div class="pill ${state.ui.taskFilter===fl?'active':''}" onclick="setTaskFilter('${fl}')">${fl}</div>`).join('')}</div>
+    <div class="search-wrap" style="max-width:240px; margin-left:auto;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input placeholder="Search tasks…" value="${esc(state.ui.taskSearch||'')}" oninput="setTaskSearch(this.value)">
+    </div>
+  </div>
+  <div class="list">
+    ${list.length ? list.map(t=>taskRow(t)).join('') : `<div class="empty">${ICONS.tasks}<div class="e-title">No tasks match this view</div><div class="e-sub">Try a different filter or add a new task.</div></div>`}
+  </div>
+  `;
+}
+function setTaskFilter(f){ state.ui.taskFilter=f; render(); }
+function setTaskSearch(v){ state.ui.taskSearch=v; render(); }
+function toggleTaskDone(id){
+  const t = state.tasks.find(x=>x.id===id); if(!t) return;
+  t.status = t.status==='COMPLETED' ? 'IN PROGRESS' : 'COMPLETED';
+  saveState(); render();
+}
+function openTaskModal(id){
+  const t = id ? state.tasks.find(x=>x.id===id) : {name:'',date:todayISO(),time:'',platform:'LinkedIn',category:'Content',priority:'MEDIUM',status:'HOLD',notes:''};
+  const isEdit = !!id;
+  showModal(`
+    <div class="modal-head"><h3>${isEdit?'Edit Task':'Add Task'}</h3><button class="close-x" onclick="closeModal()">${ICONS.plus}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Task Name</label><input id="f_name" value="${esc(t.name)}" placeholder="e.g. Design carousel page 3"></div>
+      <div class="field-row">
+        <div class="field"><label>Date</label><input type="date" id="f_date" value="${t.date||''}"></div>
+        <div class="field"><label>Time</label><input type="time" id="f_time" value="${t.time||''}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Platform</label><select id="f_platform">${PLATFORMS.map(p=>`<option ${t.platform===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        <div class="field"><label>Category</label><select id="f_category">${CATEGORIES.map(c=>`<option ${t.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Priority</label><select id="f_priority">${PRIORITIES.map(p=>`<option ${t.priority===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        <div class="field"><label>Status</label><select id="f_status">${TASK_STATUSES.map(s=>`<option ${t.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea id="f_notes" placeholder="Optional notes">${esc(t.notes)}</textarea></div>
+    </div>
+    <div class="modal-foot">
+      ${isEdit?`<button class="btn btn-danger" onclick="deleteItem('tasks','${id}'); closeModal();">Delete</button>`:''}
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask('${id||''}')">Save Task</button>
+    </div>
+  `);
+}
+function saveTask(id){
+  const name = document.getElementById('f_name').value.trim();
+  if(!name){ toast('Task name is required'); return; }
+  const data = {
+    name, date:document.getElementById('f_date').value, time:document.getElementById('f_time').value,
+    platform:document.getElementById('f_platform').value, category:document.getElementById('f_category').value,
+    priority:document.getElementById('f_priority').value, status:document.getElementById('f_status').value,
+    notes:document.getElementById('f_notes').value
+  };
+  if(id){ Object.assign(state.tasks.find(t=>t.id===id), data); }
+  else { data.id = uid(); state.tasks.push(data); }
+  saveState(); closeModal(); render(); toast('Task saved');
+}
+
+/* ============================= COURSES ============================= */
+function courseProgress(c){
+  const mods = c.modules||[], labs = c.labs||[];
+  const modPct = mods.length? 100*mods.filter(m=>m.status==='COMPLETED').length/mods.length : 0;
+  const labPct = labs.length? 100*labs.filter(l=>l.status==='COMPLETED').length/labs.length : 0;
+  return {modPct, labPct};
+}
+function renderCourses(){
+  if(state.ui.openCourseId){
+    const c = state.courses.find(x=>x.id===state.ui.openCourseId);
+    if(c) return renderCourseDetail(c);
+    state.ui.openCourseId = null;
+  }
+  return `
+  <div class="section-head">
+    <div><h2>Course Plan</h2><div class="sub">${state.courses.length} course${state.courses.length===1?'':'s'} tracked</div></div>
+    <button class="btn btn-primary" onclick="openCourseModal()">${ICONS.plus} Add Course</button>
+  </div>
+  <div class="grid grid-3">
+    ${state.courses.length ? state.courses.map(c=>{
+      const {modPct,labPct} = courseProgress(c);
+      return `
+      <div class="card course-card" onclick="openCourse('${c.id}')">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="font-size:15.5px; font-weight:800;">${esc(c.name)} ${c.demo?'<span class="demo-tag">DEMO</span>':''}</div>
+            <div style="font-size:12px; color:var(--ink-500); font-weight:600; margin-top:2px;">${esc(c.category||'')}</div>
+          </div>
+          ${badge(c.status)}
+        </div>
+        <div style="margin-top:14px; font-size:11.5px; font-weight:700; color:var(--ink-500);">MODULE PROGRESS · ${Math.round(modPct)}%</div>
+        <div class="progress-bar"><div style="width:${modPct}%"></div></div>
+        <div style="margin-top:10px; font-size:11.5px; font-weight:700; color:var(--ink-500);">LAB PROGRESS · ${Math.round(labPct)}%</div>
+        <div class="progress-bar green"><div style="width:${labPct}%"></div></div>
+        <div style="margin-top:12px; font-size:11.5px; color:var(--ink-500); font-weight:600;">Launch: ${fmtDateNice(c.launchDate)}</div>
+      </div>`;
+    }).join('') : `<div class="empty" style="grid-column:1/-1">${ICONS.courses}<div class="e-title">No courses yet</div><div class="e-sub">Add your first course to start tracking modules and labs.</div></div>`}
+  </div>`;
+}
+function openCourse(id){ state.ui.openCourseId = id; render(); }
+function renderCourseDetail(c){
+  const {modPct,labPct} = courseProgress(c);
+  return `
+  <button class="btn btn-sm" onclick="state.ui.openCourseId=null; render();">&larr; All Courses</button>
+  <div class="section-head" style="margin-top:14px">
+    <div>
+      <h2>${esc(c.name)} ${c.demo?'<span class="demo-tag">DEMO</span>':''}</h2>
+      <div class="sub">${esc(c.category||'')} · Trainer: ${esc(c.trainer||'—')} · Launch ${fmtDateNice(c.launchDate)}</div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      ${badge(c.status)}
+      <button class="btn btn-sm" onclick="openCourseModal('${c.id}')">${ICONS.edit} Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteItem('courses','${c.id}'); state.ui.openCourseId=null; render();">${ICONS.trash}</button>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:16px">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:14px">Modules</h3><span style="font-size:12px;font-weight:800;color:var(--blue-600)">${Math.round(modPct)}%</span>
+      </div>
+      <div class="progress-bar"><div style="width:${modPct}%"></div></div>
+      <div style="margin-top:12px">
+        ${(c.modules||[]).map(m=>moduleRow(c.id,'modules',m)).join('') || `<div class="empty" style="padding:16px 0">No modules yet.</div>`}
+      </div>
+      <div class="mini-add"><input id="newModuleName" placeholder="New module name…" onkeydown="if(event.key==='Enter') addSubItem('${c.id}','modules')"><button class="btn btn-sm" onclick="addSubItem('${c.id}','modules')">${ICONS.plus}</button></div>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-size:14px">Labs</h3><span style="font-size:12px;font-weight:800;color:var(--green-700)">${Math.round(labPct)}%</span>
+      </div>
+      <div class="progress-bar green"><div style="width:${labPct}%"></div></div>
+      <div style="margin-top:12px">
+        ${(c.labs||[]).map(l=>moduleRow(c.id,'labs',l)).join('') || `<div class="empty" style="padding:16px 0">No labs yet.</div>`}
+      </div>
+      <div class="mini-add"><input id="newLabName" placeholder="New lab name…" onkeydown="if(event.key==='Enter') addSubItem('${c.id}','labs')"><button class="btn btn-sm" onclick="addSubItem('${c.id}','labs')">${ICONS.plus}</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px; margin-bottom:4px;">Course Timeline</h3>
+    <div class="sub" style="margin-bottom:4px">Click a stage to set planned / completed dates.</div>
+    <div class="timeline">
+      ${renderTimeline(c)}
+    </div>
+  </div>
+  `;
+}
+function moduleRow(courseId, kind, item){
+  const cls = item.status==='COMPLETED'?'green':(item.status==='IN PROGRESS'?'blue':'grey');
+  return `
+  <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--grey-100)">
+    <div style="flex:1; font-size:13px; font-weight:600;">${esc(item.name)}</div>
+    <select style="font-size:11px; padding:4px 6px; border-radius:7px; border:1px solid var(--grey-200); font-weight:700;" onchange="setSubStatus('${courseId}','${kind}','${item.id}',this.value)">
+      ${['NOT STARTED','IN PROGRESS','COMPLETED'].map(s=>`<option ${item.status===s?'selected':''}>${s}</option>`).join('')}
+    </select>
+    <div class="icon-btn-sm" onclick="removeSubItem('${courseId}','${kind}','${item.id}')">${ICONS.trash}</div>
+  </div>`;
+}
+function addSubItem(courseId, kind){
+  const inputId = kind==='modules'?'newModuleName':'newLabName';
+  const val = document.getElementById(inputId).value.trim();
+  if(!val) return;
+  const c = state.courses.find(x=>x.id===courseId);
+  c[kind].push({id:uid(), name:val, status:'NOT STARTED'});
+  saveState(); render();
+}
+function setSubStatus(courseId, kind, itemId, status){
+  const c = state.courses.find(x=>x.id===courseId);
+  const item = c[kind].find(i=>i.id===itemId); item.status = status;
+  saveState(); render();
+}
+function removeSubItem(courseId, kind, itemId){
+  const c = state.courses.find(x=>x.id===courseId);
+  c[kind] = c[kind].filter(i=>i.id!==itemId);
+  saveState(); render();
+}
+function renderTimeline(c){
+  let nextFound = false;
+  return MILESTONE_STAGES.map(s=>{
+    const m = c.milestones[s.key] || {planned:'',done:''};
+    const overdue = isOverdue(m.planned, m.done);
+    const isNext = !m.done && !nextFound && (nextFound = true);
+    let cls = m.done ? 'done' : (overdue ? 'overdue' : (isNext?'next':''));
+    let sub = '';
+    if(m.done) sub = `Completed ${fmtDateNice(m.done)}`;
+    else if(m.planned){ const d = daysBetween(m.planned); sub = d<0 ? `${Math.abs(d)} day${Math.abs(d)===1?'':'s'} overdue` : `Planned ${fmtDateNice(m.planned)} · ${d} day${d===1?'':'s'} away`; }
+    else sub = 'No date set';
+    return `
+    <div class="tl-item ${cls}" onclick="openMilestoneModal('${c.id}','${s.key}')">
+      <div class="tl-dot"></div>
+      <div class="tl-title">${s.label}</div>
+      <div class="tl-sub">${sub}</div>
+    </div>`;
+  }).join('');
+}
+function openMilestoneModal(courseId, key){
+  const c = state.courses.find(x=>x.id===courseId);
+  const m = c.milestones[key] || {planned:'',done:''};
+  const label = MILESTONE_STAGES.find(s=>s.key===key).label;
+  showModal(`
+    <div class="modal-head"><h3>${label}</h3><button class="close-x" onclick="closeModal()">${ICONS.plus}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Planned Date</label><input type="date" id="m_planned" value="${m.planned||''}"></div>
+      <div class="field"><label>Completed Date</label><input type="date" id="m_done" value="${m.done||''}"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMilestone('${courseId}','${key}')">Save</button>
+    </div>
+  `);
+}
+function saveMilestone(courseId, key){
+  const c = state.courses.find(x=>x.id===courseId);
+  c.milestones[key] = {planned:document.getElementById('m_planned').value, done:document.getElementById('m_done').value};
+  saveState(); closeModal(); render();
+}
+function openCourseModal(id){
+  const c = id ? state.courses.find(x=>x.id===id) : {name:'',category:'',startDate:todayISO(),launchDate:'',trainer:'',totalSessions:'',status:'PLANNING'};
+  showModal(`
+    <div class="modal-head"><h3>${id?'Edit Course':'Add Course'}</h3><button class="close-x" onclick="closeModal()">${ICONS.plus}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Course Name</label><input id="c_name" value="${esc(c.name)}" placeholder="e.g. Exadata"></div>
+      <div class="field"><label>Course Category</label><input id="c_category" value="${esc(c.category)}" placeholder="e.g. Oracle Database"></div>
+      <div class="field-row">
+        <div class="field"><label>Start Date</label><input type="date" id="c_start" value="${c.startDate||''}"></div>
+        <div class="field"><label>Launch Date</label><input type="date" id="c_launch" value="${c.launchDate||''}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Trainer</label><input id="c_trainer" value="${esc(c.trainer)}"></div>
+        <div class="field"><label>Total Sessions</label><input type="number" id="c_sessions" value="${c.totalSessions||''}"></div>
+      </div>
+      <div class="field"><label>Status</label><select id="c_status">${COURSE_STATUSES.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="modal-foot">
+      ${id?`<button class="btn btn-danger" onclick="deleteItem('courses','${id}'); closeModal(); state.ui.openCourseId=null; render();">Delete</button>`:''}
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCourse('${id||''}')">Save Course</button>
+    </div>
+  `);
+}
+function saveCourse(id){
+  const name = document.getElementById('c_name').value.trim();
+  if(!name){ toast('Course name is required'); return; }
+  const data = {
+    name, category:document.getElementById('c_category').value, startDate:document.getElementById('c_start').value,
+    launchDate:document.getElementById('c_launch').value, trainer:document.getElementById('c_trainer').value,
+    totalSessions:document.getElementById('c_sessions').value, status:document.getElementById('c_status').value
+  };
+  if(id){ Object.assign(state.courses.find(c=>c.id===id), data); }
+  else{
+    data.id = uid(); data.modules=[]; data.labs=[];
+    data.milestones = {}; MILESTONE_STAGES.forEach(s=> data.milestones[s.key]={planned:'',done:''});
+    state.courses.push(data);
+  }
+  saveState(); closeModal(); render(); toast('Course saved');
+}
+
+/* ============================= WEBINARS ============================= */
+function renderWebinars(){
+  const views = ['month','week','agenda'];
+  return `
+  <div class="section-head">
+    <div><h2>Webinar Calendar</h2><div class="sub">${state.webinars.length} webinar${state.webinars.length===1?'':'s'} tracked</div></div>
+    <button class="btn btn-primary" onclick="openWebinarModal(null,'${todayISO()}')">${ICONS.plus} Add Webinar</button>
+  </div>
+  <div class="tab-bar">${views.map(v=>`<button class="tab-btn ${state.ui.webinarView===v?'active':''}" onclick="setWebinarView('${v}')">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div>
+  ${state.ui.webinarView==='month' ? renderWebinarMonth() : renderWebinarAgenda(state.ui.webinarView==='week')}
+  `;
+}
+function setWebinarView(v){ state.ui.webinarView=v; render(); }
+function renderWebinarMonth(){
+  const y = state.ui.calYear, m = state.ui.calMonth;
+  const first = new Date(y,m,1); const startOffset = first.getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const monthName = first.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  let cells = '';
+  for(let i=0;i<startOffset;i++) cells += `<div class="cal-cell other"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const iso = `${y}-${pad(m+1)}-${pad(d)}`;
+    const isToday = iso===todayISO();
+    const webs = state.webinars.filter(w=>w.date===iso);
+    cells += `<div class="cal-cell ${isToday?'today':''}" onclick="openWebinarModal(null,'${iso}')">
+      <div class="cal-daynum">${d}</div>
+      ${webs.map(w=>`<div class="cal-chip ${w.status==='COMPLETED'?'completed':''} ${w.status==='CANCELLED'?'cancelled':''}" onclick="event.stopPropagation(); openWebinarDetail('${w.id}')">${esc(w.title)}</div>`).join('')}
+    </div>`;
+  }
+  const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return `
+  <div class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <button class="icon-btn-sm" onclick="shiftMonth(-1)">&larr;</button>
+      <h3 style="font-size:14.5px">${monthName}</h3>
+      <button class="icon-btn-sm" onclick="shiftMonth(1)">&rarr;</button>
+    </div>
+    <div class="cal-grid">
+      ${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}
+      ${cells}
+    </div>
+  </div>`;
+}
+function shiftMonth(delta){
+  let m = state.ui.calMonth + delta, y = state.ui.calYear;
+  if(m<0){m=11;y--;} if(m>11){m=0;y++;}
+  state.ui.calMonth=m; state.ui.calYear=y; render();
+}
+function renderWebinarAgenda(weekOnly){
+  let list = state.webinars.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  if(weekOnly){
+    const start = new Date(); start.setDate(start.getDate()-start.getDay());
+    const end = new Date(start); end.setDate(end.getDate()+6);
+    list = list.filter(w=>{ if(!w.date) return false; const d=new Date(w.date+'T00:00:00'); return d>=start && d<=end; });
+  }
+  if(!list.length) return `<div class="empty">${ICONS.webinars}<div class="e-title">No webinars ${weekOnly?'this week':'scheduled'}</div><div class="e-sub">Click "Add Webinar" to plan your next session.</div></div>`;
+  return list.map(w=>webinarCard(w)).join('');
+}
+function webinarCard(w){
+  const d = daysBetween(w.date);
+  return `
+  <div class="webinar-card">
+    <div class="wc-top">
+      <div>
+        <div class="wc-title">${esc(w.title)} ${w.demo?'<span class="demo-tag">DEMO</span>':''}</div>
+        <div class="wc-meta">
+          <span>${ICONS.cal}${fmtDateNice(w.date)}</span>
+          <span>${ICONS.clock}${fmtTime(w.startTime)}${w.endTime?' – '+fmtTime(w.endTime):''} IST</span>
+          <span>${esc(w.platform)}</span>
+          ${d!==null && d>=0 && w.status!=='COMPLETED' && w.status!=='CANCELLED' ? `<span style="color:var(--blue-600); font-weight:700;">${d===0?'Today':d+' days away'}</span>`:''}
+        </div>
+      </div>
+      ${badge(w.status)}
+    </div>
+    <div class="wc-actions">
+      ${w.regLink?`<a class="btn btn-sm" href="${esc(w.regLink)}" target="_blank" rel="noopener">${ICONS.link} Register</a>`:''}
+      ${w.meetingLink?`<a class="btn btn-sm" href="${esc(w.meetingLink)}" target="_blank" rel="noopener">${ICONS.link} Meeting Link</a>`:''}
+      <button class="btn btn-sm" onclick="openWebinarModal('${w.id}')">${ICONS.edit} Edit</button>
+      ${w.status!=='COMPLETED'?`<button class="btn btn-sm" onclick="markWebinarComplete('${w.id}')">${ICONS.check} Mark Completed</button>`:''}
+      <button class="btn btn-sm" onclick="openWebinarDetail('${w.id}')">Promotion Checklist</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteItem('webinars','${w.id}')">${ICONS.trash}</button>
+    </div>
+  </div>`;
+}
+function markWebinarComplete(id){ const w=state.webinars.find(x=>x.id===id); w.status='COMPLETED'; saveState(); render(); toast('Marked completed'); }
+function openWebinarDetail(id){
+  const w = state.webinars.find(x=>x.id===id);
+  const groups = {}; (w.checklist||[]).forEach(it=>{ (groups[it.group]=groups[it.group]||[]).push(it); });
+  showModal(`
+    <div class="modal-head"><h3>${esc(w.title)} — Promotion Checklist</h3><button class="close-x" onclick="closeModal()">${ICONS.plus}</button></div>
+    <div class="modal-body">
+      ${Object.keys(groups).map(g=>`
+        <div style="margin-bottom:12px">
+          <div style="font-size:11px; font-weight:800; color:var(--ink-500); text-transform:uppercase; letter-spacing:.03em; margin-bottom:4px;">${g}</div>
+          ${groups[g].map(it=>`
+            <div class="checklist-item ${it.done?'done':''}">
+              <div class="chk ${it.done?'checked':''}" onclick="toggleChecklistItem('${w.id}','${it.id}')">${ICONS.check}</div>
+              <div class="txt">${esc(it.label)}</div>
+            </div>`).join('')}
+        </div>`).join('')}
+      <div class="mini-add"><input id="newChecklistItem" placeholder="Add custom checklist item…"><select id="newChecklistGroup" style="max-width:150px; padding:7px; border-radius:8px; border:1px solid var(--grey-200); font-size:12px;">${CHECKLIST_TEMPLATE.map(g=>`<option>${g.group}</option>`).join('')}</select><button class="btn btn-sm" onclick="addChecklistItem('${w.id}')">${ICONS.plus}</button></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" onclick="closeModal()">Done</button></div>
+  `);
+}
+function toggleChecklistItem(webinarId, itemId){
+  const w = state.webinars.find(x=>x.id===webinarId);
+  const it = w.checklist.find(i=>i.id===itemId); it.done = !it.done;
+  saveState(); openWebinarDetail(webinarId);
+}
+function addChecklistItem(webinarId){
+  const label = document.getElementById('newChecklistItem').value.trim();
+  const group = document.getElementById('newChecklistGroup').value;
+  if(!label) return;
+  const w = state.webinars.find(x=>x.id===webinarId);
+  w.checklist.push({id:uid(), group, label, done:false});
+  saveState(); openWebinarDetail(webinarId);
+}
+function openWebinarModal(id, prefDate){
+  const w = id ? state.webinars.find(x=>x.id===id) : {title:'',date:prefDate||todayISO(),startTime:'',endTime:'',platform:'Zoom',topic:'',trainer:'',regLink:'',meetingLink:'',expectedAttendees:'',status:'PLANNED',notes:''};
+  showModal(`
+    <div class="modal-head"><h3>${id?'Edit Webinar':'Add Webinar'}</h3><button class="close-x" onclick="closeModal()">${ICONS.plus}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Webinar Title</label><input id="w_title" value="${esc(w.title)}" placeholder="e.g. Free Live OCI Architecture Session"></div>
+      <div class="field-row">
+        <div class="field"><label>Date</label><input type="date" id="w_date" value="${w.date||''}"></div>
+        <div class="field"><label>Platform</label><select id="w_platform">${PLATFORMS.map(p=>`<option ${w.platform===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Start Time</label><input type="time" id="w_start" value="${w.startTime||''}"></div>
+        <div class="field"><label>End Time</label><input type="time" id="w_end" value="${w.endTime||''}"></div>
+      </div>
+      <div class="field"><label>Topic</label><input id="w_topic" value="${esc(w.topic)}"></div>
+      <div class="field-row">
+        <div class="field"><label>Trainer</label><input id="w_trainer" value="${esc(w.trainer)}"></div>
+        <div class="field"><label>Expected Attendees</label><input type="number" id="w_attendees" value="${w.expectedAttendees||''}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Registration Link</label><input id="w_reg" value="${esc(w.regLink)}" placeholder="https://"></div>
+        <div class="field"><label>Meeting Link</label><input id="w_meet" value="${esc(w.meetingLink)}" placeholder="https://"></div>
+      </div>
+      <div class="field"><label>Status</label><select id="w_status">${WEBINAR_STATUSES.map(s=>`<option ${w.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label>Notes</label><textarea id="w_notes">${esc(w.notes)}</textarea></div>
+    </div>
+    <div class="modal-foot">
+      ${id?`<button class="btn btn-danger" onclick="deleteItem('webinars','${id}'); closeModal();">Delete</button>`:''}
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveWebinar('${id||''}')">Save Webinar</button>
+    </div>
+  `);
+}
+function saveWebinar(id){
+  const title = document.getElementById('w_title').value.trim();
+  if(!title){ toast('Webinar title is required'); return; }
+  const data = {
+    title, date:document.getElementById('w_date').value, startTime:document.getElementById('w_start').value, endTime:document.getElementById('w_end').value,
+    platform:document.getElementById('w_platform').value, topic:document.getElementById('w_topic').value, trainer:document.getElementById('w_trainer').value,
+    regLink:document.getElementById('w_reg').value, meetingLink:document.getElementById('w_meet').value, expectedAttendees:document.getElementById('w_attendees').value,
+    status:document.getElementById('w_status').value, notes:document.getElementById('w_notes').value
+  };
+  if(id){ Object.assign(state.webinars.find(w=>w.id===id), data); }
+  else{ data.id = uid(); data.checklist = buildChecklist(false); state.webinars.push(data); }
+  saveState(); closeModal(); render(); toast('Webinar saved');
+}
+
+/* ============================= CONTENT / KANBAN ============================= */
+function renderContent(){
+  return `
+  <div class="section-head">
+    <div><h2>Content Pipeline</h2><div class="sub">Drag cards between stages</div></div>
+    <button class="btn btn-primary" onclick="openContentModal()">${ICONS.plus} Add Content</button>
+  </div>
+  <div class="kanban">
+    ${KANBAN_COLS.map(col=>{
+      const items = state.content.filter(k=>k.column===col);
+      return `
+      <div class="kcol" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${col}')">
+        <div class="kcol-head"><h4>${col}</h4><span class="kcol-count">${items.length}</span></div>
+        ${items.map(k=>`
+          <div class="kcard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${k.id}')" onclick="openContentModal('${k.id}')">
+            <div class="kc-title">${esc(k.title)}</div>
+            <div class="kc-meta"><span>${esc(k.platform)}</span>·<span>${esc(k.type)}</span>${k.date?`·<span>${fmtDateNice(k.date)}</span>`:''}</div>
+          </div>`).join('')}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function onDropCard(ev, col){
+  ev.preventDefault(); ev.currentTarget.classList.remove('dragover');
+  const id = ev.dataTransfer.getData('text/plain');
+  const item = state.content.find(k=>k.id===id); if(!item) return;
+  item.column = col;
+  if(col==='PUBLISHED') item.publishingStatus='PUBLISHED';
+  if(col==='SCHEDULED') item.publishingStatus='SCHEDULED';
+  saveState(); render();
+}
+function openContentModal(id){
+  const k = id ? state.content.find(x=>x.id===id) : {title:'',platform:'Instagram',type:'Reel',topic:'',date:todayISO(),time:'',caption:'',creativeStatus:'IDEA',publishingStatus:'SCHEDULED',cta:'',link:'',column:'IDEAS'};
+  showModal(`
+    <div class="modal-head"><h3>${id?'Edit Content':'Add Content'}</h3><button class="close-x" onclick="closeModal()">${ICONS.plus}</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Title</label><input id="k_title" value="${esc(k.title)}" placeholder="e.g. Crack Your OCI Interview"></div>
+      <div class="field-row">
+        <div class="field"><label>Platform</label><select id="k_platform">${['LinkedIn','Instagram','YouTube','WhatsApp'].map(p=>`<option ${k.platform===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        <div class="field"><label>Content Type</label><select id="k_type">${CONTENT_TYPES.map(t=>`<option ${k.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Topic</label><input id="k_topic" value="${esc(k.topic)}"></div>
+      <div class="field-row">
+        <div class="field"><label>Date</label><input type="date" id="k_date" value="${k.date||''}"></div>
+        <div class="field"><label>Time</label><input type="time" id="k_time" value="${k.time||''}"></div>
+      </div>
+      <div class="field"><label>Caption</label><textarea id="k_caption">${esc(k.caption)}</textarea></div>
+      <div class="field-row">
+        <div class="field"><label>CTA</label><input id="k_cta" value="${esc(k.cta)}" placeholder="e.g. Link in bio"></div>
+        <div class="field"><label>Link</label><input id="k_link" value="${esc(k.link)}" placeholder="https://"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Creative Status</label><select id="k_creative">${CREATIVE_STATUSES.map(s=>`<option ${k.creativeStatus===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Publishing Status</label><select id="k_publish">${PUBLISH_STATUSES.map(s=>`<option ${k.publishingStatus===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Pipeline Stage</label><select id="k_column">${KANBAN_COLS.map(c=>`<option ${k.column===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    </div>
+    <div class="modal-foot">
+      ${id?`<button class="btn btn-danger" onclick="deleteItem('content','${id}'); closeModal();">Delete</button>`:''}
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveContent('${id||''}')">Save</button>
+    </div>
+  `);
+}
+function saveContent(id){
+  const title = document.getElementById('k_title').value.trim();
+  if(!title){ toast('Title is required'); return; }
+  const data = {
+    title, platform:document.getElementById('k_platform').value, type:document.getElementById('k_type').value, topic:document.getElementById('k_topic').value,
+    date:document.getElementById('k_date').value, time:document.getElementById('k_time').value, caption:document.getElementById('k_caption').value,
+    cta:document.getElementById('k_cta').value, link:document.getElementById('k_link').value,
+    creativeStatus:document.getElementById('k_creative').value, publishingStatus:document.getElementById('k_publish').value, column:document.getElementById('k_column').value
+  };
+  if(id){ Object.assign(state.content.find(k=>k.id===id), data); }
+  else{ data.id = uid(); state.content.push(data); }
+  saveState(); closeModal(); render(); toast('Content saved');
+}
+
+/* ============================= SOCIAL TIMING ============================= */
+const BEST_TIMES = [
+  {platform:'LinkedIn', days:'Tue – Thu', primary:'9 – 11 AM (traditional B2B window)', secondary:'3 – 5 PM (2026 shift toward afternoon/evening)', type:'Text posts, carousels, thought leadership', source:'Buffer State of Social 2026 (4.8M posts) · Sprout Social 2026 (2B engagements)'},
+  {platform:'Instagram', days:'Wed & Thu (Tue also strong)', primary:'12 – 1 PM (midday break)', secondary:'6 – 8 PM (evening scroll)', type:'Reels, carousels', source:'Buffer 2026 (9.6M posts) · Sprout Social 2026'},
+  {platform:'YouTube Shorts', days:'Fri strongest; Tue–Thu reliable', primary:'12 – 3 PM (lunch scroll)', secondary:'6 – 9 PM (evening scroll)', type:'Shorts', source:'SocialPilot 2026 (301k videos) · Hopper HQ 2026'},
+  {platform:'YouTube Long-form', days:'Wed – Fri (Sun also strong per some studies)', primary:'2 – 4 PM (before evening peak)', secondary:'8 – 11 AM weekends', type:'Tutorials, long explainers', source:'SocialPilot 2026 · vidIQ / Buffer 1.8M-video analysis 2026'},
+];
+function renderTiming(){
+  const ov = state.socialOverrides;
+  return `
+  <div class="section-head"><div><h2>Best Posting Time Research</h2><div class="sub">Benchmark starting points — all times shown in each study's local/audience timezone</div></div></div>
+  <div class="card" style="margin-bottom:16px; background:var(--amber-50); border-color:#f3dca4;">
+    <div style="font-size:13px; color:var(--amber-700); font-weight:600; line-height:1.6;">
+      These are industry benchmark starting points from 2026 studies, not a guaranteed "algorithm boost" for any single account. Most large studies (Buffer, Sprout Social, SocialPilot) report engagement in the audience's own local timezone, not a fixed IST slot — so treat the windows below as a starting hypothesis, run your content at those local-equivalent hours for ExaGuru's India/IST audience, then let your own analytics decide. Fill in "Best Time for ExaGuru" below once you have enough data.
+    </div>
+  </div>
+  <div class="card" style="overflow-x:auto; margin-bottom:20px;">
+    <table class="data-table">
+      <thead><tr><th>Platform</th><th>Best Days</th><th>Starting Time</th><th>Secondary Time</th><th>Content Type</th><th>Source</th></tr></thead>
+      <tbody>
+        ${BEST_TIMES.map(r=>`<tr>
+          <td><b>${r.platform}</b></td><td>${r.days}</td><td>${r.primary}</td><td>${r.secondary}</td><td>${r.type}</td>
+          <td style="font-size:11px; color:var(--ink-500)">${r.source}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+  <div class="section-head"><h2>Best Time for ExaGuru</h2><div class="sub">Editable — update as your own analytics come in</div></div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="field"><label>LinkedIn</label><input id="ov_linkedin" value="${esc(ov.linkedin)}" placeholder="e.g. Wed 4 PM IST — highest saves" oninput="ov.linkedin=this.value; saveState();"></div>
+      <div class="field"><label>Instagram</label><input id="ov_instagram" value="${esc(ov.instagram)}" placeholder="e.g. Thu 7:30 PM IST" oninput="ov.instagram=this.value; saveState();"></div>
+    </div>
+    <div class="card">
+      <div class="field"><label>YouTube Shorts</label><input id="ov_ys" value="${esc(ov.youtubeShorts)}" placeholder="e.g. Fri 6 PM IST" oninput="ov.youtubeShorts=this.value; saveState();"></div>
+      <div class="field"><label>YouTube Long-form</label><input id="ov_yl" value="${esc(ov.youtubeLong)}" placeholder="e.g. Sun 9 AM IST" oninput="ov.youtubeLong=this.value; saveState();"></div>
+    </div>
+  </div>
+  `;
+}
+
+/* ============================= ANALYTICS ============================= */
+const ANALYTICS_FIELDS = {
+  linkedin: {label:'LinkedIn', fields:['impressions','reactions','comments','followers']},
+  instagram: {label:'Instagram', fields:['reach','views','saves','shares','followers']},
+  youtube: {label:'YouTube', fields:['views','watchTime','subscribers','ctr']},
+  webinar: {label:'Webinar', fields:['registrations','attendees','leads']},
+};
+function renderAnalytics(){
+  return `
+  <div class="section-head"><h2>Analytics</h2><div class="sub">Log your own metrics — nothing here is estimated or auto-filled</div></div>
+  <div class="grid grid-2">
+    ${Object.keys(ANALYTICS_FIELDS).map(k=>analyticsCard(k)).join('')}
+  </div>`;
+}
+function analyticsCard(key){
+  const conf = ANALYTICS_FIELDS[key];
+  const log = state.analyticsLog[key]||[];
+  const latest = log[log.length-1];
+  return `
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h3 style="font-size:14.5px">${conf.label}</h3>
+      <span style="font-size:11px; color:var(--ink-400); font-weight:600;">${log.length} entr${log.length===1?'y':'ies'}</span>
+    </div>
+    ${!log.length ? `<div class="empty" style="padding:24px 0">${ICONS.analytics}<div class="e-title">No data yet</div><div class="e-sub">Add your metrics.</div></div>` : `
+      <div class="bar-chart">
+        ${log.slice(-6).map(e=>{
+          const max = Math.max(...log.slice(-6).map(x=>Number(x[conf.fields[0]])||0),1);
+          const h = Math.max(4, 100*((Number(e[conf.fields[0]])||0)/max));
+          return `<div class="bar-col"><div class="bar" style="height:${h}%"></div><div class="bar-lbl">${e.date.slice(5)}</div></div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:11px; color:var(--ink-500); margin-top:4px; font-weight:600;">${conf.fields[0]} over last ${Math.min(6,log.length)} entries</div>
+    `}
+    <div class="metric-input-grid">
+      <input type="date" id="a_${key}_date" value="${todayISO()}" style="padding:8px 9px; border-radius:8px; border:1px solid var(--grey-200); font-size:12.5px; grid-column:1/-1;">
+      ${conf.fields.map(f=>`<input type="number" id="a_${key}_${f}" placeholder="${f}">`).join('')}
+    </div>
+    <button class="btn btn-sm btn-primary" style="margin-top:10px" onclick="addAnalyticsEntry('${key}')">${ICONS.plus} Log Entry</button>
+    ${latest? `<div style="font-size:11px; color:var(--ink-400); margin-top:8px;">Last logged ${fmtDateNice(latest.date)}</div>`:''}
+  </div>`;
+}
+function addAnalyticsEntry(key){
+  const conf = ANALYTICS_FIELDS[key];
+  const entry = {date: document.getElementById(`a_${key}_date`).value || todayISO()};
+  let hasVal = false;
+  conf.fields.forEach(f=>{ const v = document.getElementById(`a_${key}_${f}`).value; entry[f]=v; if(v!=='') hasVal=true; });
+  if(!hasVal){ toast('Enter at least one metric'); return; }
+  state.analyticsLog[key].push(entry);
+  saveState(); render(); toast('Metrics logged');
+}
+
+/* ============================= SETTINGS ============================= */
+function renderSettings(){
+  return `
+  <div class="section-head"><h2>Settings</h2></div>
+  <div class="how-box">
+    <h4>How to use this dashboard</h4>
+    <ol>
+      <li>Start each morning on <b>Dashboard</b> — check alerts, today's tasks, and what's overdue.</li>
+      <li>Use the floating <b>+</b> button (bottom right) or <b>Quick Add</b> to add a task, course, webinar, or content item in seconds.</li>
+      <li><b>Daily Tasks</b>: check items off, filter by status, and search to find anything fast.</li>
+      <li><b>Courses</b>: click a course card to open module/lab checklists and the milestone timeline — click any milestone to set planned/completed dates.</li>
+      <li><b>Webinars</b>: switch between Month, Week and Agenda views. Every new webinar auto-generates a promotion checklist you can tick off or extend.</li>
+      <li><b>Content Calendar</b>: drag cards across pipeline stages from Ideas through Published.</li>
+      <li><b>Social Timing</b>: reference the researched benchmark table, then fill in "Best Time for ExaGuru" as your own analytics come in.</li>
+      <li><b>Analytics</b>: log your real numbers — the dashboard never fabricates data.</li>
+      <li>Everything is saved automatically. Use <b>Export Data</b> below regularly as a backup.</li>
+    </ol>
+  </div>
+  <div class="grid grid-3">
+    <div class="card">
+      <h3 style="font-size:14px; margin-bottom:8px;">Export Data</h3>
+      <p style="font-size:12.5px; color:var(--ink-500); margin-bottom:10px;">Download a JSON backup of every task, course, webinar and content item.</p>
+      <button class="btn btn-primary" onclick="exportData()">${ICONS.download} Export JSON</button>
+    </div>
+    <div class="card">
+      <h3 style="font-size:14px; margin-bottom:8px;">Import Data</h3>
+      <p style="font-size:12.5px; color:var(--ink-500); margin-bottom:10px;">Restore from a previously exported JSON backup. This replaces current data.</p>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
+      <button class="btn" onclick="document.getElementById('importFile').click()">${ICONS.upload} Import JSON</button>
+    </div>
+    <div class="card">
+      <h3 style="font-size:14px; margin-bottom:8px;">Reset Demo Data</h3>
+      <p style="font-size:12.5px; color:var(--ink-500); margin-bottom:10px;">Wipes everything and restores the original OCI demo course &amp; webinar.</p>
+      <button class="btn btn-danger" onclick="resetDemo()">${ICONS.reset} Reset</button>
+    </div>
+  </div>`;
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`exaguru-dashboard-backup-${todayISO()}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  toast('Backup downloaded');
+}
+function importData(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed.tasks || !parsed.courses){ toast('Invalid backup file'); return; }
+      state = parsed;
+      if(!state.ui) state.ui = {activeTab:'dashboard', taskFilter:'ALL', taskSearch:'', webinarView:'agenda', calMonth:new Date().getMonth(), calYear:new Date().getFullYear(), openCourseId:null};
+      saveState(); render(); toast('Data imported');
+    }catch(e){ toast('Could not read file'); }
+  };
+  reader.readAsText(file);
+}
+function resetDemo(){
+  if(!confirm('This will delete all your data and restore the demo dataset. Continue?')) return;
+  state = demoState(); saveState(); render(); toast('Demo data restored');
+}
+
+/* ============================= SHARED: delete, modal, fab, notif, search ============================= */
+function deleteItem(kind, id){
+  if(!confirm('Delete this item? This cannot be undone.')) return;
+  state[kind] = state[kind].filter(x=>x.id!==id);
+  saveState(); render(); toast('Deleted');
+}
+function showModal(html){
+  document.getElementById('modalRoot').innerHTML = `<div class="modal-backdrop" onclick="if(event.target===this) closeModal()"><div class="modal">${html}</div></div>`;
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+
+function toggleFab(){
+  document.getElementById('fabBtn').classList.toggle('open');
+  document.getElementById('fabMenu').classList.toggle('open');
+}
+function renderFabMenu(){
+  const items = [
+    {label:'Add Task', icon:'tasks', fn:"openQuickAdd('task')"},
+    {label:'Add Course', icon:'courses', fn:"openQuickAdd('course')"},
+    {label:'Add Webinar', icon:'webinars', fn:"openQuickAdd('webinar')"},
+    {label:'Add Content', icon:'content', fn:"openQuickAdd('content')"},
+    {label:'Add Milestone', icon:'cal', fn:"openQuickAdd('milestone')"},
+  ];
+  document.getElementById('fabMenu').innerHTML = items.map(i=>`<div class="fab-menu-item" onclick="${i.fn}">${ICONS[i.icon]}${i.label}</div>`).join('');
+}
+function openQuickAdd(type){
+  document.getElementById('fabBtn').classList.remove('open');
+  document.getElementById('fabMenu').classList.remove('open');
+  if(type==='task') openTaskModal();
+  else if(type==='course') openCourseModal();
+  else if(type==='webinar') openWebinarModal();
+  else if(type==='content') openContentModal();
+  else if(type==='milestone'){
+    if(!state.courses.length){ toast('Add a course first'); return; }
+    const c = state.courses[0];
+    openMilestoneModal(c.id, MILESTONE_STAGES.find(s=>!c.milestones[s.key].done).key || MILESTONE_STAGES[0].key);
+  }
+}
+
+function toggleNotif(ev){
+  ev.stopPropagation();
+  const dd = document.getElementById('notifDropdown');
+  const opening = !dd.classList.contains('open');
+  dd.classList.toggle('open');
+  if(opening){
+    const alerts = computeAlerts();
+    dd.innerHTML = `<div class="dd-head">Notifications (${alerts.length})</div>` +
+      (alerts.length? alerts.map(a=>`<div class="alert alert-${a.level}" style="margin:4px 6px">${ICONS.warn}<div><b>${esc(a.title)}</b><div class="a-sub">${esc(a.sub)}</div></div></div>`).join('')
+      : `<div class="empty" style="padding:24px 10px">${ICONS.check}<div class="e-title">All caught up</div></div>`);
+  }
+}
+document.addEventListener('click', (e)=>{
+  const dd = document.getElementById('notifDropdown');
+  if(dd && !dd.contains(e.target) && !e.target.closest('.icon-btn')) dd.classList.remove('open');
+});
+function renderNotifBadge(){
+  const n = computeAlerts().length;
+  document.getElementById('notifDot').style.display = n? 'block':'none';
+}
+
+let searchDebounce=null;
+function onGlobalSearch(v){
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(()=>{
+    if(!v){ return; }
+    if(state.ui.activeTab==='tasks'){ state.ui.taskSearch=v; render(); return; }
+    // jump to tasks with search applied for a unified experience
+    state.ui.activeTab='tasks'; state.ui.taskFilter='ALL'; state.ui.taskSearch=v; render();
+  }, 300);
+}
+
+document.getElementById('menuBtn').addEventListener('click', ()=>document.getElementById('sidebar').classList.toggle('open'));
+function initResponsiveMenu(){
+  if(window.innerWidth<=900) document.getElementById('menuBtn').style.display='flex';
+}
+
+/* ============================= INIT ============================= */
+(async function init(){
+  await loadState();
+  initResponsiveMenu();
+  render();
+})();
+</script>
+</body>
+</html>
